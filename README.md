@@ -10,4 +10,4 @@ As each image is changed it is removed from the list until empty at which point 
 
 Uses the "shuf" and "convert" utilities to randomise the list and correctly orient the image before displaying.
 
-The Xfce version specifies which display to set the image on - so customise as required.
+The Xfce version specifies which display to set the image on - use Xfce Settings Editor and look in xfce4-desktop to see backdrop options.
