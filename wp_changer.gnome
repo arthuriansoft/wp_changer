@@ -1,0 +1,58 @@
+#!/bin/sh
+# Set random wallpappers on Gnome desktop.
+
+
+# Variables:
+
+LIST=~/.wp_changer_list
+SLEEP=300
+USER=$(whoami)
+ID=`id -u`
+export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$ID/bus
+WALLS_DIR="/home/$USER/Pictures/"
+
+
+# Kill any already running processes:
+
+killall -u $USER -o 1m wp_changer.xfce 2> /dev/null
+
+
+# Cleanup:
+
+rm /tmp/tmp.*.wp.img.$USER 2> /dev/null
+
+
+# Create picture list if it doens't exist:
+
+if [ ! -f $LIST ]
+then
+	find $WALLS_DIR -type f \( -name "*.JPG" -o -name "*.jpg" \) | shuf - -o $LIST
+fi
+
+
+# Step through list:
+
+while [ `wc -l $LIST | awk '{print $1}'` -gt 0 ]
+do
+	TMPIMG=`mktemp --suffix=.wp.img.$USER`
+	IMAGE=`head -1 $LIST`
+
+	if [ -f "$IMAGE" ]
+	then
+		convert -auto-orient "$IMAGE" "$TMPIMG"
+		gsettings set org.gnome.desktop.background picture-uri "file://$TMPIMG"
+	fi
+
+
+	# Remove line from image list:
+
+	sed -i '1d' $LIST
+
+	sleep $SLEEP
+	rm $TMPIMG
+done
+
+
+# Remove empty image list:
+
+rm $LIST
